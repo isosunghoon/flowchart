@@ -1,0 +1,15 @@
+[
+    {
+        "name":"yee",
+        "parent":-1,
+        "description":"hello world",
+        "albums":[
+            {
+                "name":"boring",
+                "year":2024,
+                "artist":"me",
+                "img":"https://i.scdn.co/image/ab67616d0000b2735d2fdd1564ccab97e60c656f"
+            }
+        ]
+    }
+]

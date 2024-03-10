@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamdong Flowchart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        *{
+            padding:0;
+            margin:0;
+        }
+        #main{
+            border: 1px solid black;
+        }
+        .link {
+            stroke: #999; 
+            stroke-opacity: 0.6;
+            stroke-width: 1.5px;
+        }
+        .nodes circle {
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+        .nodes text {
+            font-size: 12px;
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <svg id='main' width="960" height="600"></svg>
+    <script>
+        fetch('./data.json').then((response) => {
+            return response.json()
+        }).then((data) => {
+            main(data)
+        }).catch((err) => {
+            console.log('error: ' + err)
+        })
+        function main(data) {
+        }
+
+const nodes = [
+    { id: "Node1" }, { id: "Node2" }, { id: "Node3" },
+];
+
+const links = [
+    { source: "Node1", target: "Node2" },
+    { source: "Node2", target: "Node3" },
+    { source: "Node3", target: "Node1" },
+];
+
+const svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+// Simulation setup with forces
+const simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d => d.id))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2));
+
+// Render the edges (links)
+const link = svg.append("g")
+    .attr("class", "links")
+    .selectAll("line")
+    .data(links)
+    .enter().append("line")
+    .attr("class", "link");
+
+// Render the nodes
+const node = svg.append("g")
+    .attr("class", "nodes")
+    .selectAll("g")
+    .data(nodes)
+    .enter().append("g");
+
+node.append("circle")
+    .attr("r", 5)
+    .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+node.append("text")
+    .text(d => d.id)
+    .attr("x", 8)
+    .attr("y", 3);
+
+simulation
+    .on("tick", () => {
+        link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+
+        node
+            .attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+
+// Drag functions
+function dragstarted(event) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    event.subject.fx = event.subject.x;
+    event.subject.fy = event.subject.y;
+}
+
+function dragged(event) {
+    event.subject.fx = event.x;
+    event.subject.fy = event.y;
+}
+
+function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+}
+    </script>
+</body>
+</html>
